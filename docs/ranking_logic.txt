@@ -1,0 +1,8 @@
+Badminton ranking order (selected period)
+1. Lower error average per game.
+2. Lower total errors across Service faults, Service return, Unforced and Forced errors.
+3. Higher Winning points.
+4. Higher win rate.
+5. Fewer completed matches when win rate is equal.
+6. More wins when match count is equal.
+7. Player name as deterministic final tie-break.

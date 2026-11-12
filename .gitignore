@@ -1,0 +1,78 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Databases and runtime data
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+static/uploads/
+static/scorer_album/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+
+# Temporary and generated files
+*.log
+tmp/
+temp/
+*.bak
+*.backup
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Phase 1C: sensitive migration exports
+scripts/migration/output/
+
+# Sensitive database design documentation pending sanitization
+docs/DATABASE_DESIGN_MYSQL.md
+docs/hotpatches/db-before-site-content-20261110-132240.py
+
+# Runtime application data
+data/
+sports_data/
+travel_data/
+scorer_data/
+scorer2_data/
+
+# Historical and duplicate application copies
+pkg/
+finalstat/
+finalstatv5/
+
+# Legacy frontend pending dependency review
+scorer2_frontend/
+
+# Runtime credentials and generated files
+.env
+.env.*
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.pem
+*.key
+*.p12
+*.pfx
+__pycache__/
+*.pyc

@@ -1,0 +1,138 @@
+name: Indian Family Market - Static Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    name: Source integrity and syntax
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Configure Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify prohibited files
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib
+          import sys
+
+          root = pathlib.Path(".")
+          forbidden = []
+
+          for path in root.rglob("*"):
+              if not path.is_file():
+                  continue
+
+              if ".git" in path.parts:
+                  continue
+
+              name = path.name.lower()
+
+              if (
+                  name == ".env"
+                  or name.startswith(".env.")
+                  or name.endswith((
+                      ".db", ".sqlite", ".sqlite3",
+                      ".pem", ".key", ".p12", ".pfx",
+                      ".sql"
+                  ))
+              ):
+                  forbidden.append(str(path))
+
+          for name in sorted(forbidden):
+              print("PROHIBITED:", name)
+
+          if forbidden:
+              sys.exit(1)
+
+          print("PROHIBITED FILE CHECK: PASS")
+          PY
+
+      - name: Validate Python 3.11 syntax
+        shell: bash
+        run: |
+          python - <<'PY'
+          import ast
+          import pathlib
+          import sys
+
+          files = sorted(pathlib.Path(".").rglob("*.py"))
+          failures = []
+
+          for path in files:
+              try:
+                  ast.parse(
+                      path.read_bytes(),
+                      filename=str(path),
+                      feature_version=(3, 11)
+                  )
+              except (SyntaxError, ValueError) as exc:
+                  failures.append(
+                      "{}: {}".format(
+                          path,
+                          type(exc).__name__
+                      )
+                  )
+
+          print("Python files:", len(files))
+          print("Syntax failures:", len(failures))
+
+          for name in failures:
+              print("FAILED:", name)
+
+          if failures:
+              sys.exit(1)
+
+          print("PYTHON SYNTAX: PASS")
+          PY
+
+      - name: Verify required application files
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib
+          import sys
+
+          required = [
+              "app/main.py",
+              "app/config.py",
+              "app/db.py",
+              "app/mariadb_adapter.py",
+              "passenger_wsgi.py",
+              "requirements.txt",
+              "pytest.ini",
+              "static/index.html",
+              "static/admin.html",
+          ]
+
+          missing = [
+              name for name in required
+              if not pathlib.Path(name).is_file()
+          ]
+
+          for name in missing:
+              print("MISSING:", name)
+
+          if missing:
+              sys.exit(1)
+
+          print("REQUIRED SOURCE FILES: PASS")
+          PY
