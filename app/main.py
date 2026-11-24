@@ -1986,9 +1986,8 @@ def admin_page():
 
 @app.get("/travel", include_in_schema=False)
 def travel_page():
-    if _MARKET_EXTENDED_MODE == "redirect":
-        return _SpinoutRedirect(_COMMUNITY_BASE_URL + "/travel", status_code=307)
-    return branded_page("travel.html")
+    from fastapi import HTTPException
+    raise HTTPException(status_code=404, detail="Not Found")
 
 @app.get("/sports", include_in_schema=False)
 def sports_page():
